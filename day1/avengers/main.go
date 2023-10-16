@@ -97,6 +97,7 @@ func EmailValidation(email string) bool {
 }
 
 func main() {
+	// Hero Data
 	hulk := Hero{
 		Name:     "Hulk",
 		Email:    "hulk@avengers.com",
@@ -104,5 +105,6 @@ func main() {
 		Health:   140,
 	}
 
+	// Call and Display Output Fuction
 	fmt.Println(IsRequired(hulk))
 }
