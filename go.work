@@ -1,0 +1,7 @@
+go 1.21.1
+
+use (
+	./day1/preview
+	./day1/reflect
+	./day1/avengers
+)
