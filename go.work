@@ -4,4 +4,8 @@ use (
 	./day1/preview
 	./day1/reflect
 	./day1/avengers
+	./day2/first_http
+	./day2/avengers
+	./day2/http-router
+	./day2/avengers-v2
 )
