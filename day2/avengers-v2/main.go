@@ -14,18 +14,19 @@ func main() {
 	router := httprouter.New()
 
 	inventoryHandler := handler.NewInventoryHandler(db)
+	criminalHandler := handler.NewCriminalHandler(db)
 
 	// Router
 	router.GET("/heroes", handler.GetHeroes)
 	router.GET("/villain", handler.GetVillain)
+	// Inventory
 	router.GET("/inventories", inventoryHandler.GetInventories)
 	router.GET("/inventories/:id", inventoryHandler.GetInventoriesById)
 	router.POST("/inventories", inventoryHandler.PostInventory)
 	router.PUT("/inventories/:id", inventoryHandler.PutInventory)
 	router.DELETE("/inventories/:id", inventoryHandler.DeleteInventory)
+	// Criminal Reports
+	router.GET("/criminal", criminalHandler.GetCriminalReports)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
-
-// google wire - package dependency injection
-// broken pipeline

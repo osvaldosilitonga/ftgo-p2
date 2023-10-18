@@ -28,7 +28,6 @@ func (handler Inventory) GetInventories(w http.ResponseWriter, r *http.Request, 
 
 	// Inventories Object
 	inventories := []entity.Inventories{}
-	// var inventories []entity.Inventories
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
