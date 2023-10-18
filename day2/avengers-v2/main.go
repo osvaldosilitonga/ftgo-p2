@@ -26,3 +26,6 @@ func main() {
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
+
+// google wire - package dependency injection
+// broken pipeline

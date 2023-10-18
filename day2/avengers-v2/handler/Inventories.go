@@ -28,6 +28,7 @@ func (handler Inventory) GetInventories(w http.ResponseWriter, r *http.Request, 
 
 	// Inventories Object
 	inventories := []entity.Inventories{}
+	// var inventories []entity.Inventories
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -36,6 +37,7 @@ func (handler Inventory) GetInventories(w http.ResponseWriter, r *http.Request, 
 	SELECT name, stock FROM inventories
 	`)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{
 			"msg": "Failed when retrive data inventories.",
 		})
@@ -48,6 +50,7 @@ func (handler Inventory) GetInventories(w http.ResponseWriter, r *http.Request, 
 
 		err := rows.Scan(&i.Name, &i.Stock)
 		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(map[string]string{
 				"msg": "Failed when retrive data inventories.",
 			})
@@ -57,6 +60,7 @@ func (handler Inventory) GetInventories(w http.ResponseWriter, r *http.Request, 
 		inventories = append(inventories, i)
 	}
 
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(inventories)
 }
 
@@ -117,6 +121,7 @@ func (handler Inventory) PostInventory(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{
 		"msg": "Insert Success",
 	})
