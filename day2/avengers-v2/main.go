@@ -30,6 +30,7 @@ func main() {
 	router.GET("/criminal/:id", criminalHandler.GetCriminalReportById)
 	router.POST("/criminal", criminalHandler.PostCriminalReport)
 	router.PUT("/criminal/:id", criminalHandler.PutCriminalReport)
+	router.DELETE("/criminal/:id", criminalHandler.DeleteCriminalReport)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

@@ -23,7 +23,6 @@ func NewCriminalHandler(db *sql.DB) Criminal {
 }
 
 func (handler Criminal) GetCriminalReports(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	defer handler.DB.Close()
 	w.Header().Set("content-type", "application/json")
 
 	// Criminal Reports Object
@@ -67,7 +66,6 @@ func (handler Criminal) GetCriminalReports(w http.ResponseWriter, r *http.Reques
 }
 
 func (handler Criminal) GetCriminalReportById(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	defer handler.DB.Close()
 
 	w.Header().Set("content-type", "application/json")
 
@@ -107,7 +105,6 @@ func (handler Criminal) GetCriminalReportById(w http.ResponseWriter, r *http.Req
 }
 
 func (handler Criminal) PostCriminalReport(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	defer handler.DB.Close()
 
 	w.Header().Set("content-type", "application/json")
 
@@ -144,7 +141,6 @@ func (handler Criminal) PostCriminalReport(w http.ResponseWriter, r *http.Reques
 }
 
 func (handler Criminal) PutCriminalReport(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	defer handler.DB.Close()
 
 	w.Header().Set("content-type", "application/json")
 
@@ -197,5 +193,48 @@ func (handler Criminal) PutCriminalReport(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{
 		"msg": "Update Success",
+	})
+}
+
+func (handler Criminal) DeleteCriminalReport(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+
+	w.Header().Set("content-type", "application/json")
+
+	id, err := strconv.Atoi(params.ByName("id"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"msg": "Invalid Param ID",
+		})
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	res, err := handler.DB.ExecContext(ctx, `
+	DELETE FROM CriminalReports
+	WHERE id = ?
+	`, id)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"msg": "Delete Failed.",
+		})
+		return
+	}
+
+	aff, err := res.RowsAffected()
+	if aff == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"msg": "Delete Failed.",
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"msg": "Delete Success",
 	})
 }
