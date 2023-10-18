@@ -67,6 +67,7 @@ func (handler Inventory) GetInventoriesById(w http.ResponseWriter, r *http.Reque
 
 	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{
 			"msg": "Invalid Param ID",
 		})
@@ -86,6 +87,7 @@ func (handler Inventory) GetInventoriesById(w http.ResponseWriter, r *http.Reque
 	WHERE id = ?
 	`, id).Scan(&inventories.Name, &inventories.Stock)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{
 			"msg": "Failed when retrive data inventories.",
 		})

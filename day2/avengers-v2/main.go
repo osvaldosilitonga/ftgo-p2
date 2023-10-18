@@ -27,6 +27,7 @@ func main() {
 	router.DELETE("/inventories/:id", inventoryHandler.DeleteInventory)
 	// Criminal Reports
 	router.GET("/criminal", criminalHandler.GetCriminalReports)
+	router.GET("/criminal/:id", criminalHandler.GetCriminalReportById)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

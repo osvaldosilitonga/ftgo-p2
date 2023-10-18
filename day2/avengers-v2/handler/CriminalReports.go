@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
@@ -25,7 +26,7 @@ func (handler Criminal) GetCriminalReports(w http.ResponseWriter, r *http.Reques
 	defer handler.DB.Close()
 	w.Header().Set("content-type", "application/json")
 
-	// Inventories Object
+	// Criminal Reports Object
 	criminal := []entity.CriminalReports{}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -59,6 +60,44 @@ func (handler Criminal) GetCriminalReports(w http.ResponseWriter, r *http.Reques
 		}
 
 		criminal = append(criminal, cr)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(criminal)
+}
+
+func (handler Criminal) GetCriminalReportById(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	w.Header().Set("content-type", "application/json")
+
+	id, err := strconv.Atoi(params.ByName("id"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"msg": "Invalid Param ID",
+		})
+		return
+	}
+
+	// Criminal Reports Object
+	criminal := entity.CriminalReports{}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err = handler.DB.QueryRowContext(ctx, `
+	SELECT CriminalReports.id, heroes.name, villain.name, location, date, description, status
+	FROM CriminalReports
+	JOIN heroes ON CriminalReports.hero_id = heroes.id
+	JOIN villain ON CriminalReports.villain_id = villain.id
+	WHERE CriminalReports.id = ?
+	`, id).Scan(&criminal.ID, &criminal.Hero, &criminal.Villain, &criminal.Location, &criminal.Date, &criminal.Description, &criminal.Status)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"msg": "Failed when retrive data criminal.",
+		})
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
