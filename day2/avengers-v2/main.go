@@ -28,6 +28,7 @@ func main() {
 	// Criminal Reports
 	router.GET("/criminal", criminalHandler.GetCriminalReports)
 	router.GET("/criminal/:id", criminalHandler.GetCriminalReportById)
+	router.POST("/criminal", criminalHandler.PostCriminalReport)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

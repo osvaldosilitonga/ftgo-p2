@@ -67,6 +67,8 @@ func (handler Criminal) GetCriminalReports(w http.ResponseWriter, r *http.Reques
 }
 
 func (handler Criminal) GetCriminalReportById(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	defer handler.DB.Close()
+
 	w.Header().Set("content-type", "application/json")
 
 	id, err := strconv.Atoi(params.ByName("id"))
@@ -102,4 +104,38 @@ func (handler Criminal) GetCriminalReportById(w http.ResponseWriter, r *http.Req
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(criminal)
+}
+
+func (handler Criminal) PostCriminalReport(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	defer handler.DB.Close()
+
+	w.Header().Set("content-type", "application/json")
+
+	var criminal entity.Criminal
+
+	err := json.NewDecoder(r.Body).Decode(&criminal)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err = handler.DB.ExecContext(ctx, `
+	INSERT INTO CriminalReports (hero_id, villain_id, location, date, description, status)
+	VALUES (?,?,?,?,?,?)
+	`, criminal.HeroId, criminal.VillainId, criminal.Location, criminal.Date, criminal.Description, criminal.Status)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"msg": "Insert Failed",
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"msg": "Insert Success",
+	})
 }
