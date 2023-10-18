@@ -115,7 +115,10 @@ func (handler Criminal) PostCriminalReport(w http.ResponseWriter, r *http.Reques
 
 	err := json.NewDecoder(r.Body).Decode(&criminal)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"msg": "Insert Failed",
+		})
 		return
 	}
 
