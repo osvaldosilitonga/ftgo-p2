@@ -142,3 +142,60 @@ func (handler Criminal) PostCriminalReport(w http.ResponseWriter, r *http.Reques
 		"msg": "Insert Success",
 	})
 }
+
+func (handler Criminal) PutCriminalReport(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	defer handler.DB.Close()
+
+	w.Header().Set("content-type", "application/json")
+
+	id, err := strconv.Atoi(params.ByName("id"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"msg": "Invalid Param ID",
+		})
+		return
+	}
+
+	criminal := entity.Criminal{}
+
+	// body data
+	err = json.NewDecoder(r.Body).Decode(&criminal)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"msg": "Update Failed",
+		})
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	res, err := handler.DB.ExecContext(ctx, `
+	UPDATE CriminalReports
+	SET hero_id = ?, villain_id = ?, location = ?, date = ?, description = ?, status = ?
+	WHERE id = ?
+	`, criminal.HeroId, criminal.VillainId, criminal.Location, criminal.Date, criminal.Description, criminal.Status, id)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"msg": "Upadate Failed.",
+		})
+		return
+	}
+
+	aff, err := res.RowsAffected()
+	if aff == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"msg": "Update Failed.",
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"msg": "Update Success",
+	})
+}
