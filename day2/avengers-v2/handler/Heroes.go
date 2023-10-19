@@ -27,9 +27,11 @@ func GetHeroes(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		SELECT name, universe, skill, imageURL FROM heroes
 	`)
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{
-			"msg": "Failed when retrive data heroes.",
+			"msg": "Internal Server Error",
 		})
+		return
 	}
 	defer rows.Close()
 
@@ -38,13 +40,16 @@ func GetHeroes(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 		err := rows.Scan(&h.Name, &h.Universe, &h.Skill, &h.ImageURL)
 		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]string{
-				"msg": "Failed when retrive data heroes.",
+				"msg": "Internal Server Error",
 			})
+			return
 		}
 
 		heroes = append(heroes, h)
 	}
 
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(heroes)
 }

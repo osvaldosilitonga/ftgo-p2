@@ -36,9 +36,9 @@ func (handler Inventory) GetInventories(w http.ResponseWriter, r *http.Request, 
 	SELECT name, stock FROM inventories
 	`)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{
-			"msg": "Failed when retrive data inventories.",
+			"msg": "Internal Server Error.",
 		})
 		return
 	}

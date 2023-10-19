@@ -1,0 +1,146 @@
+openapi: "3.0.2"
+info:
+  title: Avengers API
+  version: "1.0"
+  description: "Aplikasi untuk record data hero, villain dan criminal record"
+  contact:
+    name: "Osvaldo Silitonga"
+    email: "osvaldosilitonga@gmail.com"
+servers:
+  - url: http://127.0.0.1:8080
+    description: "Development Server"
+paths:
+  /heores:
+    get:
+      summary: "get all heroes"
+      description: "get all heroes data from database"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: hero name
+                    universe:
+                      type: string
+                      example: universe name
+                    skill:
+                      type: string
+                      example: skill name
+                    imageUrl:
+                      type: string
+                      example: "url path"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: "Internal Server Error"
+  /villain:
+    get:
+      summary: "get all villain"
+      description: "get all villain data from database"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: hero name
+                    universe:
+                      type: string
+                      example: universe name
+                    imageUrl:
+                      type: string
+                      example: "url path"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: "Internal Server Error"
+  /inventories:
+    get:
+      summary: "get all inventories"
+      description: "get all inventories data from database"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: item name
+                    stock:
+                      type: integer
+                      example: 2
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: "Internal Server Error"
+
+components:
+  parameters:
+    heroId:
+      name: id
+      in: path
+      description: "define specified hero id"
+      required: true
+      schema:
+        type: integer
+    villainId:
+      name: id
+      in: path
+      description: "define specified villain id"
+      required: true
+      schema:
+        type: integer
+    inventoryId:
+      name: id
+      in: path
+      description: "define specified inventory id"
+      required: true
+      schema:
+        type: integer
+  schemas:
+    requestInventory:
+      type: object
+      required:
+        - "name"
+        - "stock"
+      properties:
+        name:
+          type: string
+        stock:
+          type: integer
