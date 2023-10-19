@@ -109,6 +109,44 @@ paths:
                   msg:
                     type: string
                     example: "Internal Server Error"
+  /inventories/:id:
+    get:
+      summary: "get inventory item by ID"
+      description: "get inventory item data by specified ID from database"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: item name
+                  stock:
+                    type: integer
+                    example: 2
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: "ID Not Found"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: "Internal Server Error"
 
 components:
   parameters:

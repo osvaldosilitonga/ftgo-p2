@@ -49,9 +49,9 @@ func (handler Inventory) GetInventories(w http.ResponseWriter, r *http.Request, 
 
 		err := rows.Scan(&i.Name, &i.Stock)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]string{
-				"msg": "Failed when retrive data inventories.",
+				"msg": "Internal Server Error",
 			})
 			return
 		}
@@ -87,13 +87,14 @@ func (handler Inventory) GetInventoriesById(w http.ResponseWriter, r *http.Reque
 	WHERE id = ?
 	`, id).Scan(&inventories.Name, &inventories.Stock)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(map[string]string{
-			"msg": "Failed when retrive data inventories.",
+			"msg": "ID Not Found",
 		})
 		return
 	}
 
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(inventories)
 }
 
