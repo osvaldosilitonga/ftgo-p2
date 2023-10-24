@@ -27,7 +27,69 @@ func hashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-// func (handler User) Login(w http.ResponseWriter, r *http.Request, p httprouter.Params) {}
+func checkPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
+func (handler User) Login(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	body := entitiy.UserLogin{}
+
+	// Parse body payload
+	err := json.NewDecoder(r.Body).Decode(&body)
+	if err != nil {
+		ResponseJSON(w, http.StatusInternalServerError, map[string]any{
+			"msg":    "Json Decoder",
+			"detail": err.Error(),
+			"user":   r.Body,
+		})
+		return
+	}
+
+	isValid := LoginBodyValidation(w, body)
+	if !isValid {
+		return
+	}
+
+	query := `
+		SELECT password, role FROM users
+		WHERE email = ?;
+	`
+
+	var hash string
+	row := handler.DB.QueryRowContext(ctx, query, body.Email)
+	err = row.Scan(&hash, &body.Role)
+	if err != nil {
+		ResponseJSON(w, http.StatusBadRequest, map[string]any{
+			"msg":    "Email doesn't exist",
+			"detail": err.Error(),
+		})
+		return
+	}
+
+	passMatch := checkPasswordHash(body.Password, hash)
+	if !passMatch {
+		ResponseJSON(w, http.StatusBadRequest, map[string]any{
+			"msg": "Password not match",
+		})
+		return
+	}
+
+	res, token := GenerateToken(w, body)
+	if !res {
+		return
+	}
+
+	ResponseJSON(w, http.StatusBadRequest, map[string]any{
+		"msg":          "Login Success",
+		"access_token": token,
+	})
+}
+
 func (handler User) Register(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	// user object

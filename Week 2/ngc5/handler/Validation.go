@@ -8,7 +8,7 @@ import (
 	"regexp"
 )
 
-func isRequired(user entitiy.User) (bool, string) {
+func isRequired(user interface{}) (bool, string) {
 	t := reflect.TypeOf(user)
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
@@ -25,6 +25,19 @@ func isRequired(user entitiy.User) (bool, string) {
 func emaiValidation(email string) bool {
 	emaiRegex := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 	return emaiRegex.MatchString(email)
+}
+
+func LoginBodyValidation(w http.ResponseWriter, body entitiy.UserLogin) bool {
+	// Required Validation
+	res, msg := isRequired(body)
+	if res == false {
+		ResponseJSON(w, http.StatusBadRequest, map[string]any{
+			"message": msg,
+		})
+		return false
+	}
+
+	return true
 }
 
 func BodyValidation(w http.ResponseWriter, user entitiy.User) bool {

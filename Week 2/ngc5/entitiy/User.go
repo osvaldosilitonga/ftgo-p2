@@ -9,3 +9,9 @@ type User struct {
 	Occupation string `json:"occupation" required:"true"`
 	Role       string `json:"role"`
 }
+
+type UserLogin struct {
+	Email    string `json:"email" required:"true"`
+	Password string `json:"password" required:"true"`
+	Role     string `json:"role"`
+}

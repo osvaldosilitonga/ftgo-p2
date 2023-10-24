@@ -18,7 +18,7 @@ func main() {
 	userHandler := handler.NewUserHandler(db)
 
 	// Routes
-	// router.POST("/login", userHandler.Login)
+	router.POST("/login", middleware.Logging(userHandler.Login))
 	router.POST("/register", middleware.Logging(userHandler.Register))
 	// router.POST("/register", middleware.Logging(middleware.BodyCheck(userHandler.Register)))
 
