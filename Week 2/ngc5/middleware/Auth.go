@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"ngc5/handler"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
@@ -31,9 +32,26 @@ func Auth(next httprouter.Handle) httprouter.Handle {
 			return secretKey, nil
 		})
 
-		if parsedToken.Valid {
-			fmt.Println(parsedToken)
+		// if parsedToken.Valid {
+		// 	fmt.Println(parsedToken)
+		// }
+
+		path := strings.Split(r.URL.Path, "/")
+		// fmt.Println(path[1], "<-------- Path")
+
+		// claims := parsedToken.Claims.(jwt.MapClaims)
+		// c := jwt.MapClaims(claims)
+		claims := jwt.MapClaims(parsedToken.Claims.(jwt.MapClaims))
+
+		if path[1] != claims["role"] {
+			handler.ResponseJSON(w, http.StatusUnauthorized, map[string]any{
+				"msg": "Access Not Allowed",
+			})
+			return
 		}
+
+		// fmt.Println(claims, "<-------- Map Claims")
+		// fmt.Println(claims["role"], "<-------- Role")
 
 		if parseErr != nil || !parsedToken.Valid {
 			fmt.Println("Error while decode token : ", parseErr)

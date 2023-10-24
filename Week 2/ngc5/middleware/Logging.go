@@ -20,9 +20,9 @@ func Logging(next httprouter.Handle) httprouter.Handle {
 		method := r.Method
 		path := r.URL.Path
 
-		// Date Format (DD-MM-YY)
+		// Date Format (DD MM YY)
 		// Time Format (HH:MM:SS)
-		fmt.Printf("[%v-%v-%v] - [%v:%v:%v] - HTTP request sent ot [%v] [%v]\n", day, month, year, hour, min, second, method, path)
+		fmt.Printf("[%v %v %v] - [%v:%v:%v] - HTTP request sent to [%v] [%v]\n", day, month, year, hour, min, second, method, path)
 
 		next(w, r, p)
 	}
