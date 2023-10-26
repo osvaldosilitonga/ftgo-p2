@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"ngc7/dto"
 	"ngc7/entity"
+	"ngc7/utils"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -34,19 +35,14 @@ func (handler User) Login(ctx *gin.Context) {
 		return
 	}
 
-	// Check if returns RecordNotFound error
+	// Find by store_email
 	if result := handler.DB.Where("store_email = ?", body.StoreEmail).First(&store); result.Error != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "Bad Request",
-			"detail":  result.Error.Error(),
-		})
+		utils.ErrorMessage(ctx, &utils.ErrDataNotFound)
 		return
 	}
 
 	if body.Password != store.Password {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "Password not match",
-		})
+		utils.ErrorMessage(ctx, &utils.ErrWrongPassword)
 		return
 	}
 
@@ -60,27 +56,18 @@ func (handler User) Register(ctx *gin.Context) {
 
 	// request body
 	if err := ctx.ShouldBindJSON(&store); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "Bad Request",
-			"detail":  err.Error(),
-		})
+		utils.ErrorMessage(ctx, &utils.ErrBadRequest)
 		return
 	}
 
 	r := handler.DB.Preload("Product").Create(&store)
 	if r.Error != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Internal Server Error",
-			"detail":  r.Error,
-		})
+		utils.ErrorMessage(ctx, &utils.ErrInternalServer)
 		return
 	}
 
 	if r.RowsAffected == 0 {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "Internal Server Error",
-			"detail":  r.Error,
-		})
+		utils.ErrorMessage(ctx, &utils.ErrBadRequest)
 		return
 	}
 
