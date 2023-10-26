@@ -1,10 +1,6 @@
-package entity
+package dto
 
-import "gorm.io/gorm"
-
-type Product struct {
-	gorm.Model
-	ID          uint   `json:"product_id" gorm:"primaryKey"`
+type ProductPost struct {
 	Name        string `json:"name" binding:"required"`
 	Description string `json:"description" binding:"required"`
 	ImageURL    string `json:"image_url" binding:"required"`
